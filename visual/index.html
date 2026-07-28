@@ -170,7 +170,10 @@
     .step-card .step-tag { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--ink-soft); }
     .step-card.active { background: var(--v4-red); color: white; box-shadow: 0 20px 50px rgba(229,9,20,.3); }
     .step-card.active .step-tag { color: rgba(255,255,255,.8); }
-    .step-card:not(.active) { opacity: .55; }
+    .step-card:not(.active) { background: rgba(20,20,20,.045); border-color: rgba(20,20,20,.1); }
+    .step-card:not(.active) .step-tag { color: rgba(20,20,20,.55); }
+    .step-card:not(.active) h3 { color: rgba(20,20,20,.78); }
+    .step-card:not(.active) .metric-label { color: rgba(20,20,20,.62); }
     .step-meter { margin-top: 14px; height: 8px; border-radius: 5px; background: rgba(0,0,0,.08); overflow: hidden; }
     .step-card.active .step-meter { background: rgba(255,255,255,.25); }
     .step-meter-fill { height: 100%; border-radius: 5px; }
@@ -760,7 +763,7 @@
             <tr><td>Faturamento (ticket R$ 1,2M)</td><td>R$ 1.200.000</td><td>R$ 1.200.000</td><td>R$ 1.200.000 a R$ 2.400.000</td><td>R$ 3,6M a R$ 4,8M</td></tr>
           </tbody>
         </table>
-        <div class="attention-box">Cenário Realista. Julho projetado a partir de CPL de junho/26; MQL→Visita assume melhora de 8,0% para 12,0% via plano de ação (CRM), hipótese condicionada à execução do Cliente.</div>
+        <div class="attention-box">Cenário Realista. Julho projetado a partir de CPL de junho/26; MQL→Visita assume melhora de 8,0% para 12,0% via plano de ação (CRM), hipótese condicionada à execução da Elevate.</div>
       </section>
 
       <!-- 28 CAPA PREMISSAS -->
@@ -787,8 +790,8 @@
           <tbody>
             <tr><td>Comercial</td><td>Elevate audita e reativa os 238 leads abandonados</td><td>Gargalo persiste, cenário cai para o Pessimista</td><td>Elevate</td></tr>
             <tr><td>Comercial</td><td>Elevate padroniza motivo de desqualificação</td><td>Taxa de 76% continua opaca</td><td>Elevate</td></tr>
-            <tr><td>Dados</td><td>Automação de cancelamento não volta a falhar</td><td>Novos leads válidos descartados sem detecção</td><td>Cliente / V4</td></tr>
-            <tr><td>Mídia</td><td>Verba de R$ 25.000/mês se mantém estável no Q3</td><td>Volume de lead cai proporcionalmente</td><td>V4 / Cliente</td></tr>
+            <tr><td>Dados</td><td>Automação de cancelamento não volta a falhar</td><td>Novos leads válidos descartados sem detecção</td><td>Elevate / V4</td></tr>
+            <tr><td>Mídia</td><td>Verba de R$ 25.000/mês se mantém estável no Q3</td><td>Volume de lead cai proporcionalmente</td><td>V4 / Elevate</td></tr>
             <tr><td>Atendimento</td><td>IA de atendimento estabiliza (sem falha/instabilidade no primeiro contato)</td><td>Lead esfria antes de qualquer resposta, gargalo de Lead→Visita piora ainda mais</td><td>Elevate</td></tr>
             <tr><td>Dados</td><td>Atualização do CRM passa a ser mais cautelosa e assídua</td><td>Leitura do funil (MQL/SQL/Venda) segue imprecisa e atrasada</td><td>Elevate</td></tr>
           </tbody>
