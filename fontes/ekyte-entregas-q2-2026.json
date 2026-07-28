@@ -1,0 +1,44 @@
+{
+  "fonte": "Ekyte MCP",
+  "workspaceId": 135598,
+  "workspace": "[INVICTUS] [ELEV1] Elevate Incorporadora",
+  "periodo": "2026-04-01 a 2026-06-30",
+  "extraido_em": "2026-07-27",
+  "horas_totais_min": 8793,
+  "horas_totais_h": 146.6,
+  "horas_por_mes": [
+    {"mes": "2026-04", "horas": 42.9},
+    {"mes": "2026-05", "horas": 41.3},
+    {"mes": "2026-06", "horas": 62.3}
+  ],
+  "horas_por_pessoa": [
+    {"pessoa": "Matheus Alencar", "horas": 56.0, "apontamentos": 73},
+    {"pessoa": "Maiara Trevizan", "horas": 34.5, "apontamentos": 31},
+    {"pessoa": "Ana Beatriz Quaresma de Azevedo", "horas": 27.8, "apontamentos": 33},
+    {"pessoa": "Thaily Serodio", "horas": 12.8, "apontamentos": 69},
+    {"pessoa": "Felipe Pinheiro", "horas": 12.2, "apontamentos": 9},
+    {"pessoa": "Kamila Gabrieli", "horas": 3.2, "apontamentos": 3}
+  ],
+  "tarefas_concluidas_total": 64,
+  "tarefas_por_projeto_mensal": [
+    {"projeto": "[Elevate] Abril 2026", "qtd": 11},
+    {"projeto": "[Elevate] Maio", "qtd": 21},
+    {"projeto": "[Elevate] Junho 2026", "qtd": 10},
+    {"projeto": "[Elevate] Julho 2026", "qtd": 1},
+    {"projeto": "Planejamento", "qtd": 7},
+    {"projeto": "(sem projeto mensal vinculado)", "qtd": 14}
+  ],
+  "tarefas_por_tipo_prefixo": [
+    {"prefixo": "PA (Pauta)", "qtd": 13},
+    {"prefixo": "PC (Post Copy/Criativo)", "qtd": 9},
+    {"prefixo": "AN (Analise)", "qtd": 8},
+    {"prefixo": "PPT (Apresentacao)", "qtd": 7},
+    {"prefixo": "GP (Growth Pack)", "qtd": 6},
+    {"prefixo": "OUTRO", "qtd": 6},
+    {"prefixo": "OTM (Otimizacao)", "qtd": 5},
+    {"prefixo": "EV (Evento)", "qtd": 4},
+    {"prefixo": "SM (Social Media)", "qtd": 3},
+    {"prefixo": "OCA/EKT/RI", "qtd": 3}
+  ],
+  "nota": "list_tasks nao expoe campo concludedDate explicito na resposta MCP (so currentDueDate/creationDate); contagem por mes usa vinculo ao projeto mensal Ekyte (Abril/Maio/Junho 2026), nao a data exata de conclusao. Suficiente para volume/frente, nao para serie temporal fina."
+}

@@ -1,0 +1,924 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Check-in de Quarter | Elevate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --v4-red: #e50914; --v4-red-hover: #c40712; --v4-orange: #ff481f; --v4-flame: #f0141e;
+      --v4-dark: #280001; --v4-darker: #280000; --v4-grey: #e1dcdc; --v4-white: #ffffff;
+      --v4-cream: #ffebc8; --v4-salmon: #ffb4a0; --ink: #141414; --ink-soft: #5a5a5a;
+      --line: rgba(20, 20, 20, .12); --radius: 22px; --radius-pill: 999px;
+      --hero: radial-gradient(120% 130% at 50% -10%, #ff5a2c 0%, #e50914 30%, #b00610 62%, #280001 100%);
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #171313; color: var(--ink); font-family: "IBM Plex Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
+    button { font-family: inherit; }
+    #viewport { position: fixed; inset: 0; overflow: hidden; background: radial-gradient(circle at 50% 10%, rgba(229, 9, 20, .18), transparent 38%), #171313; }
+    #deck { --deck-scale: 1; position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; overflow: hidden; transform: translate(-50%, -50%) scale(var(--deck-scale)); transform-origin: center; background: #f5f4f2; box-shadow: 0 40px 120px rgba(0, 0, 0, .45); }
+    .slide { position: absolute; inset: 0; width: 1600px; height: 900px; padding: 72px 96px 100px; overflow: hidden; opacity: 0; pointer-events: none; transform: translateX(24px); transition: opacity .28s ease, transform .28s ease; background: radial-gradient(circle at 92% 8%, rgba(229, 9, 20, .055), transparent 24%), #f5f4f2; }
+    .slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+    .slide.red { color: white; background: var(--hero); }
+    .slide.dark { color: white; background: radial-gradient(circle at 78% 15%, rgba(229, 9, 20, .5), transparent 32%), linear-gradient(145deg, #280001 0%, #130001 100%); }
+    .slide.white { background: white; }
+    .topline { position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, var(--v4-red), var(--v4-orange), transparent 76%); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 24px; font-size: 84px; line-height: .98; letter-spacing: -.055em; font-weight: 600; }
+    h2 { margin-bottom: 16px; font-size: 50px; line-height: 1.03; letter-spacing: -.04em; font-weight: 600; }
+    h3 { margin-bottom: 10px; font-size: 24px; line-height: 1.12; letter-spacing: -.02em; font-weight: 600; }
+    .lede { max-width: 1000px; color: var(--ink-soft); font-size: 23px; line-height: 1.42; font-weight: 300; }
+    .red .lede, .dark .lede { color: rgba(255, 255, 255, .72); }
+    .accent { color: var(--v4-red); }
+    .red .accent, .dark .accent { color: var(--v4-cream); }
+    .mono { font-family: "IBM Plex Mono", monospace; }
+    .eyebrow { display: inline-flex; align-items: center; min-height: 32px; padding: 6px 15px; border: 1px solid rgba(229, 9, 20, .18); border-radius: var(--radius-pill); color: var(--v4-red); background: rgba(229, 9, 20, .07); font-size: 11.5px; line-height: 1; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+    .red .eyebrow, .dark .eyebrow { color: rgba(255, 255, 255, .92); background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .35); box-shadow: inset 0 0 80px rgba(255, 255, 255, .12), inset 0 1px 8px rgba(255, 255, 255, .35), -5px 5px 20px rgba(0, 0, 0, .10); backdrop-filter: blur(14px) saturate(140%); }
+    .card { position: relative; padding: 26px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: white; }
+    .dark .card, .red .card { background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .16); color: white; }
+    .sphere { position: absolute; border: 1px solid rgba(255, 255, 255, .24); border-radius: 50%; pointer-events: none; background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .38), rgba(255, 255, 255, .045) 48%, transparent 66%); box-shadow: inset 0 0 120px rgba(255, 255, 255, .13), inset 25px 18px 70px rgba(255, 160, 70, .28); backdrop-filter: blur(3px); }
+    .icon { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-box { width: 50px; height: 50px; display: grid; place-items: center; flex: 0 0 auto; border: 1px solid rgba(229, 9, 20, .18); border-radius: 15px; color: var(--v4-red); background: rgba(229, 9, 20, .07); }
+    .red .icon-box, .dark .icon-box { color: white; border-color: rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .08); }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .big-number { color: var(--v4-red); font-size: 56px; line-height: 1; letter-spacing: -.04em; font-weight: 700; }
+    .dark .big-number, .red .big-number { color: var(--v4-cream); }
+    .metric-label { margin-top: 8px; color: var(--ink-soft); font-size: 14.5px; line-height: 1.25; }
+    .dark .metric-label, .red .metric-label { color: rgba(255,255,255,.68); }
+    .cover-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+    .brand-lockup { display: flex; align-items: center; gap: 26px; }
+    .client-wordmark { font-size: 30px; font-weight: 700; letter-spacing: -.02em; color: white; }
+    .cover-title { max-width: 1100px; margin: 28px 0 0; font-size: 90px; }
+    .slide-footer { position: absolute; z-index: 8; left: 96px; right: 96px; bottom: 30px; height: 44px; display: flex; align-items: center; pointer-events: none; }
+    .slide-footer img { width: 145px; height: 44px; object-fit: contain; object-position: left center; }
+    .navigation { position: absolute; z-index: 20; right: 52px; bottom: 25px; display: flex; align-items: center; gap: 10px; }
+    .nav-btn { width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid rgba(20, 20, 20, .12); border-radius: 50%; color: var(--ink); background: rgba(255, 255, 255, .92); box-shadow: 0 10px 30px rgba(0, 0, 0, .12); cursor: pointer; transition: transform .15s ease, background .15s ease, opacity .15s ease; }
+    .nav-btn:hover { transform: translateY(-2px); background: white; }
+    .nav-btn:disabled { opacity: .3; cursor: default; transform: none; }
+    .progress-track { position: absolute; z-index: 21; left: 0; right: 0; bottom: 0; height: 7px; background: rgba(20, 20, 20, .1); }
+    .progress-fill { width: 50%; height: 100%; background: linear-gradient(90deg, var(--v4-red), var(--v4-orange)); box-shadow: 0 0 20px rgba(229, 9, 20, .35); transition: width .3s ease; }
+    .slide-counter { position: absolute; z-index: 22; right: 176px; bottom: 39px; color: rgba(20, 20, 20, .52); font: 500 12px/1 "IBM Plex Mono", monospace; letter-spacing: .04em; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+
+    /* --- ROPRE extensions --- */
+    .cover-menu-list { display: flex; flex-direction: column; gap: 12px; margin-top: 40px; max-width: 980px; }
+    .cover-menu-row { border-radius: 16px; padding: 16px 26px; display: flex; align-items: center; gap: 18px; }
+    .cover-menu-row:not(.active) { background: rgba(255, 255, 255, .05); opacity: .62; }
+    .cover-menu-row.active { flex-direction: column; align-items: flex-start; background: var(--v4-red); padding: 24px 28px; box-shadow: 0 20px 50px rgba(229,9,20,.32); }
+    .cover-menu-row .num { font-family: "IBM Plex Mono", monospace; font-size: 14px; color: rgba(255,255,255,.5); flex: 0 0 auto; }
+    .cover-menu-row.active .num { color: rgba(255,255,255,.85); }
+    .cover-menu-row h3 { margin: 0; }
+    .cover-checklist { margin-top: 14px; display: flex; flex-direction: column; gap: 9px; }
+    .cover-checklist .ck { display: flex; align-items: center; gap: 10px; font-size: 15px; color: rgba(255,255,255,.94); }
+    .cover-checklist svg { width: 16px; height: 16px; flex: 0 0 auto; }
+
+    table.data-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+    .data-table th { text-align: right; padding: 10px 12px; border-bottom: 2px solid var(--line); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+    .data-table th:first-child { text-align: left; }
+    .data-table td { text-align: right; padding: 11px 12px; border-bottom: 1px solid var(--line); font-family: "IBM Plex Mono", monospace; font-size: 14.5px; }
+    .data-table td:first-child { text-align: left; font-family: "IBM Plex Sans", sans-serif; font-weight: 500; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .dark .data-table th { color: rgba(255,255,255,.5); border-color: rgba(255,255,255,.16); }
+    .dark .data-table td { color: white; border-color: rgba(255,255,255,.1); }
+    .dt-good { color: #059669 !important; } .dark .dt-good { color: #34d399 !important; }
+    .dt-bad { color: #dc2626 !important; } .dark .dt-bad { color: #f87171 !important; }
+
+    .attention-box { margin-top: 18px; padding: 14px 20px; border-radius: 13px; background: rgba(0,0,0,.035); border-left: 4px solid var(--v4-red); font-size: 14px; line-height: 1.45; color: var(--ink-soft); }
+    .dark .attention-box { background: rgba(255,255,255,.05); color: rgba(255,255,255,.78); border-left-color: var(--v4-cream); }
+
+    .kpi-row { display: flex; gap: 18px; margin-top: 26px; }
+    .kpi-card { flex: 1; padding: 20px 24px; border-radius: 17px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); }
+    .white .kpi-card, .slide:not(.dark):not(.red) .kpi-card { background: white; border: 1px solid var(--line); }
+    .kpi-card .kpi-val { font-family: "IBM Plex Mono", monospace; font-size: 32px; font-weight: 600; color: var(--v4-red); }
+    .dark .kpi-card .kpi-val { color: var(--v4-cream); }
+    .kpi-card .kpi-lbl { margin-top: 6px; font-size: 13px; color: var(--ink-soft); }
+    .dark .kpi-card .kpi-lbl { color: rgba(255,255,255,.6); }
+    .kpi-card .kpi-sub { margin-top: 3px; font-size: 12px; color: rgba(20,20,20,.4); }
+    .dark .kpi-card .kpi-sub { color: rgba(255,255,255,.4); }
+
+    .stat-cards-row { display: flex; gap: 18px; margin-top: 24px; }
+    .stat-card { flex: 1; padding: 22px; border-radius: 17px; border: 1px solid var(--line); background: white; }
+    .stat-card .stat-val { font-family: "IBM Plex Mono", monospace; font-size: 36px; font-weight: 700; color: var(--v4-red); }
+    .stat-card .stat-lbl { margin-top: 6px; font-size: 13.5px; color: var(--ink-soft); }
+    .hbar-block { margin-top: 26px; padding: 24px 26px; border-radius: 18px; background: rgba(5,150,105,.06); border: 1px solid rgba(5,150,105,.18); }
+    .hbar-total { font-family: "IBM Plex Mono", monospace; font-size: 30px; font-weight: 700; color: #059669; }
+    .hbar-total-lbl { font-size: 13.5px; color: var(--ink-soft); margin-top: 2px; }
+    .hbar-row { display: grid; grid-template-columns: 56px 1fr 66px; align-items: center; gap: 14px; margin-top: 12px; }
+    .hbar-row .hbar-m { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--ink-soft); }
+    .hbar-track { height: 13px; border-radius: 8px; background: rgba(20,20,20,.07); overflow: hidden; }
+    .hbar-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--v4-red), var(--v4-orange)); }
+    .hbar-row .hbar-v { font-family: "IBM Plex Mono", monospace; font-size: 13.5px; font-weight: 600; text-align: right; }
+
+    .funnel3 { display: flex; flex-direction: column; gap: 12px; margin-top: 22px; }
+    .funnel3 .col-head { display: grid; grid-template-columns: 185px 1fr 185px; gap: 18px; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: rgba(255,255,255,.5); }
+    .funnel3 .col-head span:first-child { text-align: right; }
+    .funnel3 .col-head span:last-child { text-align: left; }
+    .funnel3 .row { display: grid; grid-template-columns: 185px 1fr 185px; align-items: center; gap: 18px; }
+    .funnel3 .rate, .funnel3 .cost { font-size: 14px; line-height: 1.3; }
+    .funnel3 .rate { text-align: right; } .funnel3 .cost { text-align: left; }
+    .funnel3 .rate b, .funnel3 .cost b { display: block; font-size: 18px; font-family: "IBM Plex Mono", monospace; }
+    .funnel3 .bar-wrap { position: relative; height: 50px; border-radius: 10px; background: rgba(255,255,255,.07); overflow: hidden; }
+    .funnel3 .bar-fill { position: absolute; inset: 0 auto 0 0; border-radius: 10px; }
+    .funnel3 .bar-label { position: relative; z-index: 2; height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; font-size: 15px; }
+    .funnel3 .bar-label b { font-family: "IBM Plex Mono", monospace; font-size: 19px; }
+    .up { color: #34d399; } .down { color: #f87171; } .flat { color: rgba(255,255,255,.65); } .pending { color: #fbbf24; }
+    .invest-strip { display: flex; gap: 40px; margin-top: 18px; padding: 16px 22px; border-radius: 15px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14); }
+    .invest-strip .item .lbl { font-size: 12.5px; color: rgba(255,255,255,.55); }
+    .invest-strip .item .val { font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 600; margin-top: 2px; }
+
+    .rank-item { display: flex; align-items: center; gap: 20px; padding: 16px 22px; border-radius: 16px; background: rgba(255, 255, 255, .74); border: 1px solid rgba(20, 20, 20, .08); }
+    .dark .rank-item { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.16); }
+    .rank-num { font-family: "IBM Plex Mono", monospace; font-size: 26px; font-weight: 600; color: var(--v4-red); width: 46px; flex: 0 0 auto; }
+    .dark .rank-num { color: var(--v4-cream); }
+    .rank-body { flex: 1; }
+    .rank-meta { display: flex; gap: 22px; margin-top: 5px; font-size: 13.5px; color: var(--ink-soft); flex-wrap: wrap; }
+    .dark .rank-meta { color: rgba(255,255,255,.6); }
+    .rank-meta b { color: var(--ink); font-family: "IBM Plex Mono", monospace; }
+    .dark .rank-meta b { color: white; }
+
+    .top3-row { display: flex; gap: 22px; margin-top: 30px; }
+    .top3-card { flex: 1; padding: 28px; border-radius: 20px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16); text-align: center; }
+    .top3-card .medal { width: 56px; height: 56px; margin: 0 auto; border-radius: 50%; display: grid; place-items: center; font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 22px; }
+    .top3-card:nth-child(1) .medal { background: linear-gradient(135deg,#ffd76a,#e0a520); color: #4a3200; }
+    .top3-card:nth-child(2) .medal { background: linear-gradient(135deg,#e3e3e3,#a6a6a6); color: #3a3a3a; }
+    .top3-card:nth-child(3) .medal { background: linear-gradient(135deg,#d99566,#a85c2c); color: #3a1d05; }
+    .top3-card h3 { margin-top: 16px; }
+
+    .creative-card { flex: 1; border-radius: 20px; overflow: hidden; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16); }
+    .creative-thumb { position: relative; height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: repeating-linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.05) 10px, rgba(255,255,255,.02) 10px, rgba(255,255,255,.02) 20px); color: rgba(255,255,255,.4); font-size: 12.5px; overflow: hidden; }
+    .creative-thumb-bg { position: absolute; inset: -12px; background-size: cover; background-position: center; filter: blur(20px) brightness(.5) saturate(1.15); transform: scale(1.1); }
+    .creative-thumb img { position: relative; z-index: 1; max-width: 100%; max-height: 100%; width: auto; height: 100%; object-fit: contain; box-shadow: 0 8px 30px rgba(0,0,0,.4); }
+    .creative-body { padding: 20px 22px 24px; }
+    .creative-body h3 { font-size: 20px; }
+    .creative-sub { font-size: 12.5px; color: rgba(255,255,255,.55); font-family: "IBM Plex Mono", monospace; }
+    .creative-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 16px; }
+    .creative-stats .cs-val { font-family: "IBM Plex Mono", monospace; font-size: 17px; font-weight: 600; color: var(--v4-cream); }
+    .creative-stats .cs-lbl { margin-top: 3px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: rgba(255,255,255,.5); }
+
+    table.matrix-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+    .matrix-table th { text-align: left; padding: 12px 14px; border-bottom: 2px solid var(--line); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+    .matrix-table td { padding: 13px 14px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.35; }
+    .matrix-table tr:last-child td { border-bottom: none; }
+
+    .step-track { display: flex; gap: 18px; margin-top: 34px; }
+    .step-card { flex: 1; padding: 24px; border-radius: 20px; border: 1px solid rgba(20,20,20,.1); background: rgba(0,0,0,.02); }
+    .step-card .step-tag { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--ink-soft); }
+    .step-card.active { background: var(--v4-red); color: white; box-shadow: 0 20px 50px rgba(229,9,20,.3); }
+    .step-card.active .step-tag { color: rgba(255,255,255,.8); }
+    .step-card:not(.active) { opacity: .55; }
+    .step-meter { margin-top: 14px; height: 8px; border-radius: 5px; background: rgba(0,0,0,.08); overflow: hidden; }
+    .step-card.active .step-meter { background: rgba(255,255,255,.25); }
+    .step-meter-fill { height: 100%; border-radius: 5px; }
+
+    .num-badge { width: 44px; height: 44px; border-radius: 50%; background: var(--v4-red); color: white; display: grid; place-items: center; font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 17px; flex: 0 0 auto; }
+    .dep-chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: rgba(229,9,20,.09); color: var(--v4-red); font-size: 13px; font-weight: 600; margin-top: 4px; }
+    .nps-btn { display: inline-flex; align-items: center; gap: 10px; margin-top: 30px; padding: 16px 32px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.3); font-family: "IBM Plex Mono", monospace; font-size: 16px; color: white; }
+  </style>
+</head>
+<body>
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute">
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M9 19h2a4 4 0 0 0 4-4v-6"/></symbol>
+    <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="m3 11 14-6v14L3 13v-2Z"/><path d="M11 16v4H7l-1-6"/></symbol>
+    <symbol id="i-brush" viewBox="0 0 24 24"><path d="m14 4 6 6-8 8H6v-6l8-8Z"/><path d="M4 20h8"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><circle cx="18" cy="9" r="3"/><path d="M2 21c0-5 3-8 7-8s7 3 7 8M16 14c4 0 6 2 6 7"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-sale" viewBox="0 0 24 24"><path d="M4 6h16l-2 12H6L4 6Z"/><path d="M8 6a4 4 0 0 1 8 0"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z"/></symbol>
+    <symbol id="i-money" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M7 9H5v2M17 15h2v-2"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 2 1 21h22L12 2Z"/><path d="M12 9v5M12 17.5h.01"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></symbol>
+  </svg>
+
+  <div id="viewport">
+    <main id="deck" aria-live="polite">
+
+      <!-- 01 CAPA -->
+      <section class="slide red active" data-title="Check-in de Quarter | Elevate">
+        <div class="sphere" style="width:430px;height:430px;right:-80px;top:-115px;opacity:.55"></div>
+        <div class="sphere" style="width:245px;height:245px;right:285px;top:115px;opacity:.32"></div>
+        <div class="cover-content">
+          <div class="brand-lockup"><img src="assets/elevate-logo.png" alt="Elevate" style="width:56px;height:56px;object-fit:contain;border-radius:12px"><span class="client-wordmark mono">ELEVATE</span></div>
+          <div>
+            <span class="eyebrow">Check-in de Quarter · Q2 2026</span>
+            <h1 class="cover-title">Elevate</h1>
+            <p class="lede">Elevate Incorporadora, frente Elevate Majestic.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 SUMARIO -->
+      <section class="slide dark" data-title="Sumário">
+        <div class="topline"></div>
+        <span class="eyebrow">Agenda</span>
+        <h2 style="margin-top:22px">O que vamos ver hoje</h2>
+        <div class="cover-menu-list">
+          <div class="cover-menu-row active">
+            <span class="num">01</span>
+            <h3>Resultados</h3>
+            <div class="cover-checklist">
+              <div class="ck"><svg class="icon" style="width:16px;height:16px"><use href="#i-check"></use></svg>Evolução mensal e funil projetado versus realizado</div>
+              <div class="ck"><svg class="icon" style="width:16px;height:16px"><use href="#i-check"></use></svg>Funil por canal, campanha, público, criativo, keyword e demografia</div>
+              <div class="ck"><svg class="icon" style="width:16px;height:16px"><use href="#i-check"></use></svg>Restrição principal, gargalos e plano de ação 5W1H</div>
+            </div>
+          </div>
+          <div class="cover-menu-row"><span class="num">02</span><h3>Objetivos</h3></div>
+          <div class="cover-menu-row"><span class="num">03</span><h3>Premissas e riscos</h3></div>
+          <div class="cover-menu-row"><span class="num">04</span><h3>Entregas</h3></div>
+          <div class="cover-menu-row"><span class="num">05</span><h3>Próximos passos</h3></div>
+        </div>
+      </section>
+
+      <!-- 03 FUNIL GERAL PROJETADO VS REALIZADO -->
+      <section class="slide dark" data-title="Funil Geral | Projetado versus Realizado">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Funil geral</span>
+        <h2 style="margin-top:22px">Q2 | Funil Projetado versus Realizado</h2>
+        <div class="invest-strip">
+          <div class="item"><div class="lbl">Verba realizada (Q2)</div><div class="val">R$ 35.436,72</div></div>
+          <div class="item"><div class="lbl">Faturamento realizado (Q2)</div><div class="val">R$ 2.400.000</div></div>
+          <div class="item"><div class="lbl">Faturamento meta (Q2 · SMART)</div><div class="val">R$ 9.600.000</div></div>
+        </div>
+        <div class="funnel3">
+          <div class="col-head"><span>Taxa de passagem</span><span style="text-align:center">Volume · realizado vs meta (KR do Q2)</span><span>Custo por etapa</span></div>
+          <div class="row">
+            <div class="rate flat">n/a</div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:linear-gradient(90deg,#7f1d1d,#059669)"></div>
+              <div class="bar-label"><span>Leads</span><b>450 <span class="mono" style="font-size:12px;opacity:.7">/ meta 450</span></b></div></div>
+            <div class="cost"><span class="up">CPL</span><b class="up">R$ 78,75 <span style="font-size:12px;opacity:.7">/ meta ≤ R$ 80</span></b></div>
+          </div>
+          <div class="row">
+            <div class="rate"><span>Lead → MQL (V.A.)</span><b class="down">5,6% <span style="font-size:12px;opacity:.7">/ meta 15,0%</span></b></div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:18%;background:linear-gradient(90deg,#7f1d1d,#ef4444)"></div>
+              <div class="bar-label"><span>MQL</span><b>25 <span class="mono" style="font-size:12px">/ meta 68</span></b></div></div>
+            <div class="cost"><span class="down">CPMQL</span><b>R$ 1.417,47</b></div>
+          </div>
+          <div class="row">
+            <div class="rate"><span>MQL → Visita (V.R.)</span><b class="down">16,0% <span style="font-size:12px;opacity:.7">/ meta 40,0%</span></b></div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:7%;background:linear-gradient(90deg,#7f1d1d,#ef4444)"></div>
+              <div class="bar-label"><span>Visita / SQL</span><b>4 <span class="mono" style="font-size:12px">/ meta 27</span></b></div></div>
+            <div class="cost"><span class="down">CPSQL</span><b>R$ 8.859,18</b></div>
+          </div>
+          <div class="row">
+            <div class="rate"><span>Visita → Venda</span><b class="up">50,0% <span style="font-size:12px;opacity:.7">/ meta 30,0%</span></b></div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:4%;background:linear-gradient(90deg,#7f1d1d,#d97706)"></div>
+              <div class="bar-label"><span>Venda</span><b>2 <span class="mono" style="font-size:12px">/ meta 8</span></b></div></div>
+            <div class="cost"><span class="up">CAC</span><b>R$ 17.718,36</b></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 META ADS TABELA MENSAL -->
+      <section class="slide dark" data-title="Meta Ads | Abril a junho">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Evolução mensal</span>
+        <h2 style="margin-top:22px">Meta Ads | Abril a junho</h2>
+        <table class="data-table" style="margin-top:26px">
+          <thead><tr><th>Indicador</th><th>Abril</th><th>Maio</th><th>Junho</th><th>Total Q2</th></tr></thead>
+          <tbody>
+            <tr><td>Investimento</td><td>R$ 1.792,36</td><td>R$ 9.920,89</td><td>R$ 19.338,71</td><td>R$ 31.051,96</td></tr>
+            <tr><td>Impressões</td><td>33.367</td><td>129.388</td><td>314.503</td><td>477.258</td></tr>
+            <tr><td>CPM</td><td>R$ 53,72</td><td>R$ 76,68</td><td class="dt-bad">R$ 61,49</td><td>R$ 65,07</td></tr>
+            <tr><td>Cliques</td><td>784</td><td>2.546</td><td>4.968</td><td>8.298</td></tr>
+            <tr><td>CPC</td><td>R$ 2,29</td><td>R$ 3,90</td><td>R$ 3,89</td><td>R$ 3,74</td></tr>
+            <tr><td>Leads</td><td>27</td><td>142</td><td class="dt-good">277</td><td>446</td></tr>
+            <tr><td>CPL</td><td class="dt-good">R$ 66,38</td><td>R$ 69,86</td><td>R$ 69,81</td><td>R$ 69,62</td></tr>
+          </tbody>
+        </table>
+        <div class="attention-box">Verba cresceu 10,8x de abril a junho e o CPL se manteve estável entre R$ 66 e R$ 70; a conta escalou sem perder eficiência.</div>
+      </section>
+
+      <!-- 05 GOOGLE ADS TABELA MENSAL -->
+      <section class="slide dark" data-title="Google Ads | Abril a junho">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Evolução mensal</span>
+        <h2 style="margin-top:22px">Google Ads | Abril a junho</h2>
+        <table class="data-table" style="margin-top:26px">
+          <thead><tr><th>Indicador</th><th>Abril</th><th>Maio</th><th>Junho</th><th>Total Q2</th></tr></thead>
+          <tbody>
+            <tr><td>Investimento</td><td>sem campanha ativa</td><td>R$ 2.522,13</td><td>R$ 1.749,51</td><td>R$ 4.384,76</td></tr>
+            <tr><td>Impressões</td><td>0</td><td>6.122</td><td>3.811</td><td>10.415</td></tr>
+            <tr><td>Cliques</td><td>0</td><td>505</td><td>346</td><td>887</td></tr>
+            <tr><td>CTR</td><td>n/a</td><td>8,25%</td><td>9,08%</td><td>8,52%</td></tr>
+            <tr><td>CPC</td><td>n/a</td><td>R$ 4,99</td><td>R$ 5,06</td><td>R$ 4,94</td></tr>
+            <tr><td>Conversões</td><td>0</td><td>0</td><td>4</td><td>4</td></tr>
+            <tr><td>CPL</td><td>n/a</td><td>n/a</td><td class="dt-bad">R$ 437,38</td><td class="dt-bad">R$ 1.096,19</td></tr>
+          </tbody>
+        </table>
+        <div class="attention-box">Toda a conversão de Google do quarter aconteceu em junho; maio já investiu R$ 2.522 sem gerar conversão registrada. CPL Google é 15,7x mais caro que o Meta no total do quarter; verba pequena (12%), mas pouco eficiente.</div>
+      </section>
+
+      <!-- 06 FUNIL COMERCIAL MENSAL -->
+      <section class="slide dark" data-title="Funil comercial | Meta + Google">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Funil comercial mensal</span>
+        <h2 style="margin-top:22px">Funil comercial | Meta + Google</h2>
+        <table class="data-table" style="margin-top:24px;font-size:13.5px">
+          <thead><tr><th>Indicador</th><th>Abril</th><th>Maio</th><th>Junho</th><th>Total Q2</th></tr></thead>
+          <tbody>
+            <tr><td>Investimento</td><td>R$ 1.792,36</td><td>R$ 12.443,02</td><td>R$ 21.088,22</td><td>R$ 35.436,72</td></tr>
+            <tr><td>Leads</td><td>27</td><td>142</td><td>281</td><td>450</td></tr>
+            <tr><td>CPL</td><td>R$ 66,38</td><td>R$ 87,63</td><td>R$ 75,05</td><td>R$ 78,75</td></tr>
+            <tr><td>Lead → MQL</td><td>3,70%</td><td class="dt-good">10,56%</td><td>3,20%</td><td>5,56%</td></tr>
+            <tr><td>MQL</td><td>1</td><td>15</td><td>9</td><td>25</td></tr>
+            <tr><td>CPMQL</td><td>R$ 1.792,36</td><td class="dt-good">R$ 829,53</td><td>R$ 2.343,14</td><td>R$ 1.417,47</td></tr>
+            <tr><td>MQL → SQL</td><td class="dt-good">100,00%</td><td>6,67%</td><td>22,22%</td><td>16,00%</td></tr>
+            <tr><td>SQL / Visita</td><td>1</td><td>1</td><td>2</td><td>4</td></tr>
+            <tr><td>CPSQL</td><td class="dt-good">R$ 1.792,36</td><td class="dt-bad">R$ 12.443,02</td><td>R$ 10.544,11</td><td>R$ 8.859,18</td></tr>
+            <tr><td>SQL → Venda</td><td>0,00%</td><td class="dt-good">100,00%</td><td>50,00%</td><td>50,00%</td></tr>
+            <tr><td>Vendas</td><td>0</td><td>1</td><td>1</td><td>2</td></tr>
+            <tr><td>CAC</td><td>n/a</td><td class="dt-bad">R$ 12.443,02</td><td>R$ 21.088,22</td><td>R$ 17.718,36</td></tr>
+            <tr><td>Faturamento</td><td>R$ 0</td><td>R$ 1.200.000</td><td>R$ 1.200.000</td><td>R$ 2.400.000</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 07 JULHO EM ANDAMENTO -->
+      <section class="slide dark" data-title="Julho/2026 em andamento">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Contexto</span>
+        <h2 style="margin-top:22px">Julho/2026 em andamento <span class="mono" style="font-size:22px;font-weight:400;opacity:.6">(parcial, até 28/07 · 90% do mês decorrido)</span></h2>
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-val">R$ 15.043,78</div>
+            <div class="kpi-lbl">Investimento Meta</div>
+            <div class="step-meter" style="margin-top:10px;background:rgba(255,255,255,.14)"><div class="step-meter-fill" style="width:69%;background:#f87171"></div></div>
+            <div class="kpi-sub">Milestone R$ 21.900,00 · 69% do mês</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val">R$ 2.366,39</div>
+            <div class="kpi-lbl">Investimento Google</div>
+            <div class="step-meter" style="margin-top:10px;background:rgba(255,255,255,.14)"><div class="step-meter-fill" style="width:76%;background:#f87171"></div></div>
+            <div class="kpi-sub">Milestone R$ 3.100,00 · 76% do mês</div>
+          </div>
+          <div class="kpi-card"><div class="kpi-val">230</div><div class="kpi-lbl">Leads Meta (28 dias)</div><div class="kpi-sub" style="margin-top:16px">Já é 51% de todos os leads do Q2 inteiro</div></div>
+        </div>
+        <div class="hbar-block" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14)">
+          <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.55)">Funil comercial de julho · snapshot de hoje</div>
+          <div class="hbar-row"><div class="hbar-m" style="color:rgba(255,255,255,.6)">LEAD</div><div class="hbar-track" style="background:rgba(255,255,255,.1)"><div class="hbar-fill" style="width:100%"></div></div><div class="hbar-v" style="color:white">230</div></div>
+          <div class="hbar-row"><div class="hbar-m" style="color:rgba(255,255,255,.6)">MQL</div><div class="hbar-track" style="background:rgba(255,255,255,.1)"><div class="hbar-fill" style="width:0%"></div></div><div class="hbar-v" style="color:#fbbf24">0</div></div>
+          <div class="hbar-row"><div class="hbar-m" style="color:rgba(255,255,255,.6)">SQL</div><div class="hbar-track" style="background:rgba(255,255,255,.1)"><div class="hbar-fill" style="width:0%"></div></div><div class="hbar-v" style="color:#fbbf24">0</div></div>
+          <div class="hbar-row"><div class="hbar-m" style="color:rgba(255,255,255,.6)">VENDA</div><div class="hbar-track" style="background:rgba(255,255,255,.1)"><div class="hbar-fill" style="width:0%"></div></div><div class="hbar-v" style="color:#fbbf24">0</div></div>
+        </div>
+        <div class="attention-box">Mês em curso: funil de MQL/SQL/Venda/Receita de julho fecha junto com o mês — zerado no Growth Pack nesta rodada, não é ausência de negócio, é mês ainda não fechado. Milestone de mídia rateado pela proporção histórica Meta/Google do Q2 (88%/12%) sobre a verba de R$ 25.000 combinada com o Cliente para julho.</div>
+      </section>
+
+      <!-- 08 CAMPANHAS -->
+      <section class="slide" data-title="Por campanha">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Drill-down até lead</span>
+        <h2 style="margin-top:22px">Por campanha</h2>
+        <table class="data-table" style="margin-top:20px;font-size:12.5px">
+          <thead><tr><th>Campanha</th><th>Canal</th><th>Investimento</th><th>Impressões</th><th>Cliques</th><th>CTR</th><th>CPC</th><th>Leads</th><th>CPL</th></tr></thead>
+          <tbody>
+            <tr><td>C:01 TOPO Sudeste</td><td>Meta</td><td>R$ 7.966,48</td><td>135.937</td><td>2.623</td><td>1,93%</td><td>R$ 3,04</td><td>121</td><td class="dt-good">R$ 65,84</td></tr>
+            <tr><td>C:02 MEIO</td><td>Meta</td><td>R$ 8.588,71</td><td>112.698</td><td>2.027</td><td>1,80%</td><td>R$ 4,24</td><td>120</td><td>R$ 71,57</td></tr>
+            <tr><td>C:05 TOPO ABC/ZL/ZS · E.H.</td><td>Meta</td><td>R$ 2.697,85</td><td>46.463</td><td>653</td><td>1,41%</td><td>R$ 4,13</td><td>42</td><td>R$ 64,23</td></tr>
+            <tr><td>C:03 TOPO ABC/ZL/ZS</td><td>Meta</td><td>R$ 3.126,90</td><td>48.235</td><td>762</td><td>1,58%</td><td>R$ 4,10</td><td>39</td><td>R$ 80,18</td></tr>
+            <tr><td>C:04 TOPO Sudeste · E.H.</td><td>Meta</td><td>R$ 2.596,22</td><td>52.774</td><td>883</td><td>1,67%</td><td>R$ 2,94</td><td>38</td><td>R$ 68,32</td></tr>
+            <tr><td>C:06 MEIO · E.H.</td><td>Meta</td><td>R$ 2.600,69</td><td>43.207</td><td>602</td><td>1,39%</td><td>R$ 4,32</td><td>31</td><td>R$ 83,89</td></tr>
+            <tr><td>C:07 MEIO · E.H. FORMS 36x15</td><td>Meta</td><td>R$ 1.342,73</td><td>12.858</td><td>261</td><td class="dt-good">2,03%</td><td>R$ 5,15</td><td>24</td><td>R$ 55,95</td></tr>
+            <tr><td>C:09 TOPO ABC/ZL/ZS · FORMS</td><td>Meta</td><td>R$ 1.213,24</td><td>14.817</td><td>269</td><td>1,82%</td><td>R$ 4,51</td><td>21</td><td>R$ 57,77</td></tr>
+            <tr><td>C:08 TOPO Sudeste · FORMS</td><td>Meta</td><td>R$ 919,14</td><td>10.269</td><td>218</td><td class="dt-good">2,12%</td><td>R$ 4,22</td><td>10</td><td class="dt-bad">R$ 91,91</td></tr>
+            <tr><td>Majestic Investimento</td><td>Google</td><td>R$ 998,96</td><td>1.147</td><td>214</td><td class="dt-good">18,66%</td><td>R$ 4,67</td><td>2</td><td class="dt-bad">R$ 499,48</td></tr>
+            <tr><td>Majestic Praia</td><td>Google</td><td>R$ 854,31</td><td>2.132</td><td>186</td><td class="dt-good">8,72%</td><td>R$ 4,59</td><td>1</td><td class="dt-bad">R$ 854,31</td></tr>
+            <tr><td>Majestic Caraguatatuba (bairro)</td><td>Google</td><td>R$ 801,93</td><td>957</td><td>107</td><td class="dt-good">11,18%</td><td>R$ 7,49</td><td>1</td><td class="dt-bad">R$ 801,93</td></tr>
+            <tr><td>Majestic Caraguatatuba (Sudeste)</td><td>Google</td><td>R$ 859,17</td><td>2.608</td><td>188</td><td>7,21%</td><td>R$ 4,57</td><td>0</td><td>n/a</td></tr>
+            <tr><td>Majestic Veraneio</td><td>Google</td><td>R$ 870,39</td><td>3.571</td><td>192</td><td>5,38%</td><td>R$ 4,53</td><td>0</td><td>n/a</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 09 PUBLICO -->
+      <section class="slide" data-title="Por público">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Drill-down até lead</span>
+        <h2 style="margin-top:22px">Por público</h2>
+        <table class="data-table" style="margin-top:22px;font-size:13.5px">
+          <thead><tr><th>Público</th><th>Investimento</th><th>Impressões</th><th>Cliques</th><th>CTR</th><th>CPC</th><th>Leads</th><th>CPL</th></tr></thead>
+          <tbody>
+            <tr><td>Lookalike 1% Leads Elevate</td><td>R$ 11.723,91</td><td>167.803</td><td>2.664</td><td>1,59%</td><td>R$ 4,40</td><td>157</td><td>R$ 74,68</td></tr>
+            <tr><td>Carros de luxo</td><td>R$ 7.963,75</td><td>132.308</td><td>2.301</td><td>1,74%</td><td>R$ 3,46</td><td>128</td><td class="dt-good">R$ 62,22</td></tr>
+            <tr><td>Investimento e bolsa de valores</td><td>R$ 3.552,71</td><td>44.291</td><td>837</td><td>1,89%</td><td>R$ 4,25</td><td>56</td><td>R$ 63,44</td></tr>
+            <tr><td>Esportes luxo</td><td>R$ 3.531,81</td><td>62.041</td><td>1.212</td><td>1,95%</td><td>R$ 2,91</td><td>50</td><td>R$ 70,64</td></tr>
+            <tr><td>Público Campeão</td><td>R$ 1.917,41</td><td>27.137</td><td>597</td><td class="dt-good">2,20%</td><td>R$ 3,21</td><td>28</td><td>R$ 68,48</td></tr>
+            <tr><td>Cruzeiro</td><td>R$ 1.387,87</td><td>23.559</td><td>370</td><td>1,57%</td><td>R$ 3,75</td><td>17</td><td>R$ 81,64</td></tr>
+            <tr><td>Lanchas e Jetski</td><td>R$ 974,50</td><td>20.119</td><td>317</td><td>1,58%</td><td>R$ 3,07</td><td>10</td><td class="dt-bad">R$ 97,45</td></tr>
+          </tbody>
+        </table>
+        <div class="attention-box">Carros de luxo tem o melhor CPL absoluto (R$ 62,22). Lookalike 1% é o de maior volume (157 leads) mantendo eficiência próxima da melhor. Público Campeão tem o CTR mais alto (2,20%), mas ainda com volume pequeno para escalar isolado.</div>
+      </section>
+
+      <!-- 10 RANKING DE CRIATIVOS -->
+      <section class="slide" data-title="Ranking de criativos">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Drill-down até lead</span>
+        <h2 style="margin-top:22px">Ranking de criativos</h2>
+        <table class="data-table" style="margin-top:22px;font-size:13.5px">
+          <thead><tr><th>Criativo</th><th>Investimento</th><th>Impressões</th><th>Cliques</th><th>CTR</th><th>CPC</th><th>Leads</th><th>CPL</th></tr></thead>
+          <tbody>
+            <tr><td>AD04 · Zoom na terra</td><td>R$ 17.721,68</td><td>302.799</td><td>4.752</td><td>1,57%</td><td>R$ 3,73</td><td>269</td><td>R$ 65,88</td></tr>
+            <tr><td>AD02 · Alto padrão</td><td>R$ 7.408,31</td><td>99.682</td><td>2.045</td><td class="dt-good">2,05%</td><td>R$ 3,62</td><td>86</td><td class="dt-bad">R$ 86,14</td></tr>
+            <tr><td>AD08 · Tem lugar que você</td><td>R$ 2.168,74</td><td>24.965</td><td>483</td><td>1,93%</td><td>R$ 4,49</td><td>39</td><td class="dt-good">R$ 55,61</td></tr>
+            <tr><td>AD03 · Criar memórias</td><td>R$ 1.829,21</td><td>22.986</td><td>448</td><td>1,95%</td><td>R$ 4,08</td><td>28</td><td>R$ 65,33</td></tr>
+            <tr><td>AD05 · Lugar para passar</td><td>R$ 1.162,58</td><td>13.161</td><td>300</td><td class="dt-good">2,28%</td><td>R$ 3,88</td><td>18</td><td>R$ 64,59</td></tr>
+            <tr><td>AD01 · Detalhes da obra</td><td>R$ 660,47</td><td>12.754</td><td>247</td><td>1,94%</td><td class="dt-good">R$ 2,67</td><td>6</td><td class="dt-bad">R$ 110,08</td></tr>
+          </tbody>
+        </table>
+        <div class="attention-box">Números corrigidos nesta rodada com consulta direta ao warehouse (a leitura anterior cobria só 68% do investimento em criativos). AD08 passa a ser o melhor CPL absoluto (R$ 55,61) com volume relevante; AD04 segue líder de volume (269 leads) com CPL saudável. AD06 e AD07 (variações de teste, juntos &lt; R$ 101 investidos) não geraram lead e não entram no ranking.</div>
+      </section>
+
+      <!-- 11 TOP 3 CRIATIVOS -->
+      <section class="slide dark" data-title="Top 3 criativos">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Criativos vencedores</span>
+        <h2 style="margin-top:22px">Top 3 criativos do quarter</h2>
+        <div class="top3-row" style="align-items:stretch">
+          <div class="creative-card">
+            <div class="creative-thumb"><div class="creative-thumb-bg" style="background-image:url(assets/creative-ad04.png)"></div><img src="assets/creative-ad04.png" alt="AD04 · Zoom na terra"></div>
+            <div class="creative-body">
+              <h3>AD04 · Zoom na terra</h3>
+              <div class="creative-sub">Maior volume do quarter · 24 variações ativas</div>
+              <div class="creative-stats">
+                <div><div class="cs-val">R$ 17.721,68</div><div class="cs-lbl">Invest</div></div>
+                <div><div class="cs-val">R$ 65,88</div><div class="cs-lbl">CPL</div></div>
+                <div><div class="cs-val">1,57%</div><div class="cs-lbl">CTR</div></div>
+                <div><div class="cs-val">269</div><div class="cs-lbl">Leads</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="creative-card">
+            <div class="creative-thumb"><div class="creative-thumb-bg" style="background-image:url(assets/creative-ad02.png)"></div><img src="assets/creative-ad02.png" alt="AD02 · Alto padrão"></div>
+            <div class="creative-body">
+              <h3>AD02 · Alto padrão</h3>
+              <div class="creative-sub">2º maior volume · 20 variações ativas</div>
+              <div class="creative-stats">
+                <div><div class="cs-val">R$ 7.408,31</div><div class="cs-lbl">Invest</div></div>
+                <div><div class="cs-val">R$ 86,14</div><div class="cs-lbl">CPL</div></div>
+                <div><div class="cs-val">2,05%</div><div class="cs-lbl">CTR</div></div>
+                <div><div class="cs-val">86</div><div class="cs-lbl">Leads</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="creative-card">
+            <div class="creative-thumb"><div class="creative-thumb-bg" style="background-image:url(assets/creative-ad08.png)"></div><img src="assets/creative-ad08.png" alt="AD08 · Tem lugar que você"></div>
+            <div class="creative-body">
+              <h3>AD08 · Tem lugar que você</h3>
+              <div class="creative-sub">Melhor CPL do quarter · 25 variações ativas</div>
+              <div class="creative-stats">
+                <div><div class="cs-val">R$ 2.168,74</div><div class="cs-lbl">Invest</div></div>
+                <div><div class="cs-val">R$ 55,61</div><div class="cs-lbl">CPL</div></div>
+                <div><div class="cs-val">1,93%</div><div class="cs-lbl">CTR</div></div>
+                <div><div class="cs-val">39</div><div class="cs-lbl">Leads</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12 PALAVRAS-CHAVE -->
+      <section class="slide" data-title="Google Ads | Palavras-chave">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Google Ads</span>
+        <h2 style="margin-top:22px">Palavras-chave de maior performance</h2>
+        <table class="data-table" style="margin-top:22px;font-size:13.5px">
+          <thead><tr><th>Palavra-chave</th><th>Impressões</th><th>Cliques</th><th>CTR</th><th>Custo</th><th>Conversões</th></tr></thead>
+          <tbody>
+            <tr><td>apartamento lançamento litoral norte</td><td>839</td><td>167</td><td class="dt-good">19,90%</td><td>R$ 787,43</td><td class="dt-good">2</td></tr>
+            <tr><td>imóvel em caraguatatuba</td><td>1.434</td><td>87</td><td>6,07%</td><td>R$ 436,13</td><td>0</td></tr>
+            <tr><td>casa de praia para comprar</td><td>710</td><td>92</td><td class="dt-good">12,96%</td><td>R$ 425,77</td><td>0</td></tr>
+            <tr><td>apartamento na praia</td><td>1.072</td><td>82</td><td>7,65%</td><td>R$ 382,34</td><td class="dt-good">1</td></tr>
+            <tr><td>imóvel na praia</td><td>799</td><td>75</td><td>9,39%</td><td>R$ 340,23</td><td>0</td></tr>
+            <tr><td>comprar apartamento na planta praia</td><td>303</td><td>47</td><td class="dt-good">15,51%</td><td>R$ 211,52</td><td>0</td></tr>
+          </tbody>
+        </table>
+        <div class="attention-box">"apartamento lançamento litoral norte" concentra metade das conversões do Google com o menor CPA da conta (R$ 393,72) e o segundo melhor CTR. "Imóvel em caraguatatuba" tem o maior volume de impressão mas CTR mais baixo do grupo (6,07%) e zero conversão — candidata a revisão de correspondência.</div>
+      </section>
+
+      <!-- 13 POSICIONAMENTO -->
+      <section class="slide" data-title="Por posicionamento">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Meta Ads</span>
+        <h2 style="margin-top:22px">Por posicionamento</h2>
+        <table class="data-table" style="margin-top:22px;font-size:13.5px">
+          <thead><tr><th>Posicionamento</th><th>Investimento</th><th>Impressões</th><th>Cliques</th><th>CTR</th><th>CPC</th><th>Leads</th><th>CPL</th></tr></thead>
+          <tbody>
+            <tr><td>Instagram Feed</td><td>R$ 12.466,13</td><td>164.033</td><td>1.595</td><td>0,97%</td><td>R$ 7,82</td><td>196</td><td>R$ 63,60</td></tr>
+            <tr><td>Instagram Reels</td><td>R$ 8.017,05</td><td>136.200</td><td>1.592</td><td>1,17%</td><td>R$ 5,04</td><td>105</td><td>R$ 76,35</td></tr>
+            <tr><td>Instagram Stories</td><td>R$ 4.533,11</td><td>57.976</td><td>956</td><td>1,65%</td><td>R$ 4,74</td><td>61</td><td>R$ 74,31</td></tr>
+            <tr><td>Facebook Feed</td><td>R$ 2.780,24</td><td>57.535</td><td>2.388</td><td class="dt-good">4,15%</td><td class="dt-good">R$ 1,16</td><td>30</td><td class="dt-bad">R$ 92,67</td></tr>
+            <tr><td>Facebook Reels</td><td>R$ 2.628,40</td><td>51.852</td><td>1.601</td><td class="dt-good">3,09%</td><td class="dt-good">R$ 1,64</td><td>49</td><td class="dt-good">R$ 53,64</td></tr>
+            <tr><td>Facebook Stories</td><td>R$ 596,60</td><td>8.482</td><td>151</td><td>1,78%</td><td>R$ 3,95</td><td>5</td><td class="dt-bad">R$ 119,32</td></tr>
+          </tbody>
+        </table>
+        <div class="attention-box">Correção: o investimento por posicionamento estava subestimado na leitura anterior (batia só 33% do total investido); números agora reconciliam 100% com o Q2. Instagram concentra 84% do investimento e 85% dos leads, mas Facebook Reels tem o melhor CPL do grupo (R$ 53,64) com CTR 3x maior que o Instagram Feed — candidato a mais budget isolado no Q3.</div>
+      </section>
+
+      <!-- 14 IDADE -->
+      <section class="slide" data-title="Por idade">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Meta Ads</span>
+        <h2 style="margin-top:22px">Por idade</h2>
+        <table class="data-table" style="margin-top:22px;font-size:13.5px">
+          <thead><tr><th>Faixa etária</th><th>Investimento</th><th>Impressões</th><th>Cliques</th><th>CTR</th><th>CPC</th><th>Leads</th><th>CPL</th></tr></thead>
+          <tbody>
+            <tr><td>45 a 54</td><td>R$ 14.349,85</td><td>187.886</td><td>3.521</td><td>1,87%</td><td>R$ 4,08</td><td class="dt-good">188</td><td>R$ 76,33</td></tr>
+            <tr><td>35 a 44</td><td>R$ 9.693,80</td><td>184.473</td><td>2.649</td><td>1,44%</td><td>R$ 3,66</td><td>145</td><td>R$ 66,85</td></tr>
+            <tr><td>55 a 64</td><td>R$ 5.265,19</td><td>61.652</td><td>1.597</td><td class="dt-good">2,59%</td><td>R$ 3,30</td><td>80</td><td>R$ 65,81</td></tr>
+            <tr><td>25 a 34</td><td>R$ 1.741,54</td><td>43.224</td><td>531</td><td>1,23%</td><td>R$ 3,28</td><td>32</td><td class="dt-good">R$ 54,42</td></tr>
+          </tbody>
+        </table>
+        <div class="attention-box">Correção: a leitura anterior de investimento por idade cobria só 86% do total (a faixa 45-54 estava subestimada em ~R$ 4.250). Com o número certo, 45-54 segue dominante em volume (42% dos leads) mas com o pior CPL do grupo (R$ 76,33); 25-34 tem o melhor CPL absoluto (R$ 54,42) apesar do menor volume.</div>
+      </section>
+
+      <!-- 15 GENERO -->
+      <section class="slide" data-title="Por gênero">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Meta Ads</span>
+        <h2 style="margin-top:22px">Por gênero</h2>
+        <table class="data-table" style="margin-top:22px;font-size:14px">
+          <thead><tr><th>Gênero</th><th>Investimento</th><th>Impressões</th><th>Cliques</th><th>CTR</th><th>CPC</th><th>Leads</th><th>% do total</th></tr></thead>
+          <tbody>
+            <tr><td>Masculino</td><td>R$ 22.069,08</td><td>369.717</td><td>6.052</td><td>1,64%</td><td>R$ 3,65</td><td class="dt-good">326</td><td>73%</td></tr>
+            <tr><td>Feminino</td><td>R$ 8.855,31</td><td>105.866</td><td>2.219</td><td class="dt-good">2,10%</td><td>R$ 3,99</td><td>119</td><td>27%</td></tr>
+            <tr><td>Não informado</td><td>R$ 127,57</td><td>1.675</td><td>27</td><td>1,61%</td><td>R$ 4,73</td><td>1</td><td>0%</td></tr>
+          </tbody>
+        </table>
+        <div class="attention-box">73% dos leads são homens (leitura anterior indicava 71% com base num pull parcial); consistente em todas as faixas etárias, não é um efeito isolado de um único público. Feminino tem o melhor CTR (2,10%), mas ainda menor volume absoluto.</div>
+      </section>
+
+      <!-- 16 ESTADO -->
+      <section class="slide" data-title="Por estado">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Meta Ads</span>
+        <h2 style="margin-top:22px">Por estado</h2>
+        <table class="data-table" style="margin-top:22px">
+          <thead><tr><th>Estado</th><th>Investimento</th><th>Impressões</th><th>Cliques</th><th>CTR</th><th>CPC</th><th>CPM</th></tr></thead>
+          <tbody>
+            <tr><td>São Paulo</td><td>R$ 24.816,54</td><td>381.656</td><td>6.681</td><td>1,75%</td><td>R$ 3,71</td><td>R$ 65,02</td></tr>
+            <tr><td>Minas Gerais</td><td>R$ 4.367,92</td><td>75.073</td><td>1.226</td><td>1,63%</td><td>R$ 3,56</td><td>R$ 58,19</td></tr>
+            <tr><td>Rio de Janeiro</td><td>R$ 1.521,39</td><td>16.985</td><td>323</td><td class="dt-good">1,90%</td><td>R$ 4,71</td><td>R$ 89,56</td></tr>
+            <tr><td>Espírito Santo</td><td>R$ 346,12</td><td>3.544</td><td>68</td><td class="dt-good">1,92%</td><td class="dt-bad">R$ 5,09</td><td>R$ 97,66</td></tr>
+          </tbody>
+        </table>
+        <div class="attention-box">São Paulo concentra 80% do investimento, coerente com o recorte "SP Capital + Grande SP" da segmentação. O Meta não disponibiliza leads nem cidade nesta quebra regional; só investimento, tráfego e impressão por estado.</div>
+      </section>
+
+      <!-- 17 RESTRICAO PRINCIPAL -->
+      <section class="slide dark" data-title="Restrição principal do quarter">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Gargalos</span>
+        <h2 style="margin-top:22px">A restrição não está na mídia</h2>
+        <div class="card" style="margin-top:24px;padding:34px;border-color:rgba(255,138,128,.5);background:linear-gradient(135deg,rgba(255,138,128,.18),rgba(74,6,3,.42))">
+          <span class="eyebrow" style="background:rgba(255,255,255,.12)">Restrição principal</span>
+          <h1 style="margin-top:16px;font-size:58px">Lead → Visita: <span class="accent">0,95%</span></h1>
+          <p class="lede" style="max-width:1300px;font-size:21px">De 450 leads gerados e 50 MQL qualificados, apenas 4 chegaram a uma visita, mesmo com a mídia entregando o público certo a CPL estável. O gargalo está inteiramente depois do lead.</p>
+        </div>
+        <div class="grid-3" style="margin-top:22px">
+          <div class="card"><div class="icon-box"><svg class="icon"><use href="#i-warning"></use></svg></div><h3 style="margin-top:12px">238 leads abandonados</h3><div class="metric-label">Sem contato registrado no CRM. Auditoria aberta desde 19/06, ainda sem resultado.</div></div>
+          <div class="card"><div class="icon-box"><svg class="icon"><use href="#i-search"></use></svg></div><h3 style="margin-top:12px">76% "não qualificado"</h3><div class="metric-label">186 de 413 leads, sem motivo decomposto, pode estar descartando leads recuperáveis.</div></div>
+          <div class="card"><div class="icon-box"><svg class="icon"><use href="#i-bolt"></use></svg></div><h3 style="margin-top:12px">Automação de cancelamento indevida</h3><div class="metric-label">Ativa até 25/06. Impacto exato sobre leads válidos ainda não quantificado.</div></div>
+        </div>
+      </section>
+
+      <!-- 18-23: PLANO DE ACAO 5W1H -->
+      <section class="slide white" data-title="Plano de ação 1 | Escalar criativos campeões">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Plano de ação</span>
+        <h2 style="margin-top:22px">Prioridade 1 · Score 2,00</h2>
+        <h3 style="font-size:30px;margin-top:6px">Escalar os 2 criativos-vídeo campeões em campanhas isoladas</h3>
+        <div class="grid-2" style="margin-top:26px">
+          <div class="card"><h3>Why</h3><p class="lede" style="font-size:18px">Concentrar verba onde já há prova de eficiência, em vez de diluir em 9 campanhas com variações do mesmo público.</p></div>
+          <div class="card"><h3>What / How</h3><p class="lede" style="font-size:18px">Duplicar "Zoom na terra" e "Alto padrão" em campanha isolada nos públicos de maior volume, mantendo budget CBO nas demais.</p></div>
+          <div class="card"><h3>Who / When</h3><p class="lede" style="font-size:18px"><b>V4 (mídia)</b> · início do Q3.</p></div>
+          <div class="card"><h3>Evidência</h3><p class="lede" style="font-size:18px">"Zoom na terra" gerou 269 leads no quarter; "Alto padrão" 86, com CPL abaixo de R$ 55.</p></div>
+        </div>
+      </section>
+
+      <section class="slide white" data-title="Plano de ação 2 | Auditoria de leads abandonados">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Plano de ação</span>
+        <h2 style="margin-top:22px">Prioridade 2 · Score 0,71</h2>
+        <h3 style="font-size:30px;margin-top:6px">Fechar auditoria dos 238 leads abandonados + SLA de contato</h3>
+        <span class="dep-chip"><svg class="icon" style="width:16px;height:16px"><use href="#i-warning"></use></svg> Trava do cliente</span>
+        <div class="grid-2" style="margin-top:20px">
+          <div class="card"><h3>Why</h3><p class="lede" style="font-size:18px">É o maior gargalo do funil (Lead→Visita 0,95%) e a causa mais diretamente acionável.</p></div>
+          <div class="card"><h3>What / How</h3><p class="lede" style="font-size:18px">Auditoria manual da base de 238 leads, reativar recuperáveis; SLA de contato com prazo máximo e alertas no CRM.</p></div>
+          <div class="card"><h3>Who / When</h3><p class="lede" style="font-size:18px"><b>Cliente (comercial)</b> · primeiras 3 semanas do Q3.</p></div>
+          <div class="card"><h3>Evidência</h3><p class="lede" style="font-size:18px">Auditoria aberta em 19/06, sem resultado até o fim do quarter.</p></div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Plano de ação 3 | Motivo de desqualificação">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Plano de ação</span>
+        <h2 style="margin-top:22px">Prioridade 3 · Score 0,67</h2>
+        <h3 style="font-size:30px;margin-top:6px">Padronizar motivo de desqualificação no CRM</h3>
+        <span class="dep-chip"><svg class="icon" style="width:16px;height:16px"><use href="#i-warning"></use></svg> Trava do cliente</span>
+        <div class="grid-2" style="margin-top:20px">
+          <div class="card"><h3>Why</h3><p class="lede" style="font-size:18px">Sem saber o motivo, não dá para separar problema de tráfego de problema de processo comercial.</p></div>
+          <div class="card"><h3>What / How</h3><p class="lede" style="font-size:18px">Campo obrigatório de "motivo" no CRM + auditoria manual de amostra dos leads "não qualificados".</p></div>
+          <div class="card"><h3>Who / When</h3><p class="lede" style="font-size:18px"><b>Cliente (comercial)</b> · primeiras 4 semanas do Q3.</p></div>
+          <div class="card"><h3>Evidência</h3><p class="lede" style="font-size:18px">76% dos leads (186/413) marcados "não qualificado" sem decomposição.</p></div>
+        </div>
+      </section>
+
+      <section class="slide white" data-title="Plano de ação 4 | Automação de cancelamento">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Plano de ação</span>
+        <h2 style="margin-top:22px">Prioridade 4 · Score 0,60</h2>
+        <h3 style="font-size:30px;margin-top:6px">Levantar impacto da automação de cancelamento indevida</h3>
+        <span class="dep-chip"><svg class="icon" style="width:16px;height:16px"><use href="#i-warning"></use></svg> Trava do cliente</span>
+        <div class="grid-2" style="margin-top:20px">
+          <div class="card"><h3>Why</h3><p class="lede" style="font-size:18px">Parte dos leads pode ter sido descartada por erro de automação, não por qualidade.</p></div>
+          <div class="card"><h3>What / How</h3><p class="lede" style="font-size:18px">Relatório de leads cancelados pela automação entre início do quarter e 25/06, reclassificação manual.</p></div>
+          <div class="card"><h3>Who / When</h3><p class="lede" style="font-size:18px"><b>Cliente (CRM)</b> · primeira quinzena do Q3.</p></div>
+          <div class="card"><h3>Evidência</h3><p class="lede" style="font-size:18px">Automação rodou errada até 25/06/2026, corrigida sem levantamento retroativo do impacto.</p></div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Plano de ação 5 | Google Ads">
+        <div class="topline"></div>
+        <span class="eyebrow">Resultados · Plano de ação</span>
+        <h2 style="margin-top:22px">Prioridade 5 · Score 0,50</h2>
+        <h3 style="font-size:30px;margin-top:6px">Revisar keywords Google Ads de baixo CPA</h3>
+        <div class="grid-2" style="margin-top:20px">
+          <div class="card"><h3>Why</h3><p class="lede" style="font-size:18px">Verba pequena (12% do total) mas 15,7x menos eficiente que o Meta.</p></div>
+          <div class="card"><h3>What / How</h3><p class="lede" style="font-size:18px">Pausar keywords sem conversão no Q2, validar tag de conversão, reavaliar em 30 dias.</p></div>
+          <div class="card"><h3>Who / When</h3><p class="lede" style="font-size:18px"><b>V4 (mídia)</b> · início do Q3.</p></div>
+          <div class="card"><h3>Evidência</h3><p class="lede" style="font-size:18px">CPL Google R$ 1.096,19 vs Meta R$ 69,62 no mesmo quarter.</p></div>
+        </div>
+      </section>
+
+      <!-- 24 CAPA OBJETIVOS -->
+      <section class="slide dark" data-title="Objetivos">
+        <div class="topline"></div>
+        <span class="eyebrow">Agenda</span>
+        <h2 style="margin-top:22px">02 · Objetivos</h2>
+        <div class="cover-menu-list">
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">01</span><h3>Resultados</h3></div>
+          <div class="cover-menu-row active">
+            <span class="num">02</span><h3>Objetivos</h3>
+            <div class="cover-checklist">
+              <div class="ck"><svg class="icon" style="width:16px;height:16px"><use href="#i-check"></use></svg>STEP do projeto</div>
+              <div class="ck"><svg class="icon" style="width:16px;height:16px"><use href="#i-check"></use></svg>Objetivo SMART e OKRs do Q3</div>
+              <div class="ck"><svg class="icon" style="width:16px;height:16px"><use href="#i-check"></use></svg>Projeção detalhada do Q3</div>
+            </div>
+          </div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">03</span><h3>Premissas e riscos</h3></div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">04</span><h3>Entregas</h3></div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">05</span><h3>Próximos passos</h3></div>
+        </div>
+      </section>
+
+      <!-- 25 STEP -->
+      <section class="slide" data-title="STEP do projeto">
+        <div class="topline"></div>
+        <span class="eyebrow">Objetivos · Maturidade</span>
+        <h2 style="margin-top:22px">Onde a Elevate está na jornada</h2>
+        <div class="step-track">
+          <div class="step-card"><span class="step-tag">STEP V0</span><h3 style="margin-top:10px">Base</h3><div class="metric-label">Sem estrutura de mídia rodando.</div></div>
+          <div class="step-card active"><span class="step-tag">STEP V1 · Estamos aqui</span><h3 style="margin-top:10px">Teste e validação</h3><div class="metric-label">1º quarter operacional, validando canal, público e criativo antes de escalar.</div><div class="step-meter"><div class="step-meter-fill" style="width:35%;background:#ffb4a0"></div></div></div>
+          <div class="step-card"><span class="step-tag">STEP V2</span><h3 style="margin-top:10px">Maturação</h3><div class="metric-label">Escala com funil comercial estável.</div></div>
+          <div class="step-card"><span class="step-tag">STEP V3</span><h3 style="margin-top:10px">Aceleração</h3><div class="metric-label">Volume alto, previsível, com expansão de escopo.</div></div>
+        </div>
+      </section>
+
+      <!-- 26 OBJETIVOS Q3 SMART + OKR -->
+      <section class="slide" data-title="Objetivos do Q3 | SMART e OKRs">
+        <div class="topline"></div>
+        <span class="eyebrow">Objetivos · Próximo quarter</span>
+        <h2 style="margin-top:22px">Objetivo SMART Q3</h2>
+        <p class="lede" style="max-width:1350px">Investir R$ 75.000 em mídia paga no Q3/2026 para gerar aproximadamente 3 a 4 vendas, para alcançar faturamento entre R$ 3.600.000 e R$ 4.800.000 até 30/09/2026.</p>
+        <div class="grid-3" style="margin-top:30px">
+          <div class="card"><div class="icon-box"><svg class="icon"><use href="#i-target"></use></svg></div><h3 style="margin-top:14px">KR1</h3><div class="metric-label">Manter CPL ≤ R$ 80</div></div>
+          <div class="card"><div class="icon-box"><svg class="icon"><use href="#i-route"></use></svg></div><h3 style="margin-top:14px">KR2</h3><div class="metric-label">Elevar conversão MQL → Visita para ≥ 12% (de 8,0%)</div></div>
+          <div class="card"><div class="icon-box"><svg class="icon"><use href="#i-users"></use></svg></div><h3 style="margin-top:14px">KR3</h3><div class="metric-label">Gerar 114 MQLs no quarter</div></div>
+        </div>
+      </section>
+
+      <!-- 27 PROJECAO Q3 DETALHADA -->
+      <section class="slide white" data-title="Projeção Q3">
+        <div class="topline"></div>
+        <span class="eyebrow">Objetivos · Projeção</span>
+        <h2 style="margin-top:22px">Projeção Q3 | Funil completo, mês a mês</h2>
+        <table class="data-table" style="margin-top:20px;font-size:13px">
+          <thead><tr><th>Indicador</th><th>Julho</th><th>Agosto</th><th>Setembro</th><th>Total Q3</th></tr></thead>
+          <tbody>
+            <tr><td>Investimento</td><td>R$ 25.000</td><td>R$ 25.000</td><td>R$ 25.000</td><td>R$ 75.000</td></tr>
+            <tr><td>Leads</td><td>318</td><td>318</td><td>319</td><td>955</td></tr>
+            <tr><td>CPL</td><td>R$ 78,62</td><td>R$ 78,62</td><td>R$ 78,37</td><td>R$ 78,53</td></tr>
+            <tr><td>Lead → MQL</td><td>11,9%</td><td>11,9%</td><td>11,9%</td><td>11,9%</td></tr>
+            <tr><td>MQLs</td><td>38</td><td>38</td><td>38</td><td>114</td></tr>
+            <tr><td>CPMQL</td><td>R$ 657,89</td><td>R$ 657,89</td><td>R$ 657,89</td><td>R$ 657,89</td></tr>
+            <tr><td>MQL → Visita</td><td>12,0%</td><td>12,0%</td><td>12,0%</td><td>12,0%</td></tr>
+            <tr><td>Visitas / SQL</td><td>5</td><td>5</td><td>4</td><td>14</td></tr>
+            <tr><td>CPSQL</td><td>R$ 5.000,00</td><td>R$ 5.000,00</td><td>R$ 6.250,00</td><td>R$ 5.357,14</td></tr>
+            <tr><td>Visita → Venda</td><td>25,0%</td><td>25,0%</td><td>25,0%</td><td>25,0%</td></tr>
+            <tr><td>Vendas</td><td>1</td><td>1</td><td>1 a 2</td><td>3 a 4</td></tr>
+            <tr><td>CAC</td><td>R$ 25.000</td><td>R$ 25.000</td><td>R$ 16.667 a R$ 25.000</td><td>R$ 18.750 a R$ 25.000</td></tr>
+            <tr><td>Faturamento (ticket R$ 1,2M)</td><td>R$ 1.200.000</td><td>R$ 1.200.000</td><td>R$ 1.200.000 a R$ 2.400.000</td><td>R$ 3,6M a R$ 4,8M</td></tr>
+          </tbody>
+        </table>
+        <div class="attention-box">Cenário Realista. Julho projetado a partir de CPL de junho/26; MQL→Visita assume melhora de 8,0% para 12,0% via plano de ação (CRM), hipótese condicionada à execução do Cliente.</div>
+      </section>
+
+      <!-- 28 CAPA PREMISSAS -->
+      <section class="slide dark" data-title="Premissas e riscos">
+        <div class="topline"></div>
+        <span class="eyebrow">Agenda</span>
+        <h2 style="margin-top:22px">03 · Premissas e riscos</h2>
+        <div class="cover-menu-list">
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">01</span><h3>Resultados</h3></div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">02</span><h3>Objetivos</h3></div>
+          <div class="cover-menu-row active"><span class="num">03</span><h3>Premissas e riscos</h3></div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">04</span><h3>Entregas</h3></div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">05</span><h3>Próximos passos</h3></div>
+        </div>
+      </section>
+
+      <!-- 29 PREMISSAS E RISCOS -->
+      <section class="slide white" data-title="Premissas e riscos">
+        <div class="topline"></div>
+        <span class="eyebrow">Premissas e riscos</span>
+        <h2 style="margin-top:22px">O que precisa acontecer para a projeção se sustentar</h2>
+        <table class="matrix-table" style="margin-top:24px;font-size:15px">
+          <thead><tr><th>Item</th><th>Premissa</th><th>Risco se falhar</th><th>Dono</th></tr></thead>
+          <tbody>
+            <tr><td>Comercial</td><td>Cliente audita e reativa os 238 leads abandonados</td><td>Gargalo persiste, cenário cai para o Pessimista</td><td>Cliente</td></tr>
+            <tr><td>Comercial</td><td>Cliente padroniza motivo de desqualificação</td><td>Taxa de 76% continua opaca</td><td>Cliente</td></tr>
+            <tr><td>Dados</td><td>Automação de cancelamento não volta a falhar</td><td>Novos leads válidos descartados sem detecção</td><td>Cliente / V4</td></tr>
+            <tr><td>Mídia</td><td>Verba de R$ 25.000/mês se mantém estável no Q3</td><td>Volume de lead cai proporcionalmente</td><td>V4 / Cliente</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 30 CAPA ENTREGAS -->
+      <section class="slide dark" data-title="Entregas">
+        <div class="topline"></div>
+        <span class="eyebrow">Agenda</span>
+        <h2 style="margin-top:22px">04 · Entregas</h2>
+        <div class="cover-menu-list">
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">01</span><h3>Resultados</h3></div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">02</span><h3>Objetivos</h3></div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">03</span><h3>Premissas e riscos</h3></div>
+          <div class="cover-menu-row active"><span class="num">04</span><h3>Entregas</h3></div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">05</span><h3>Próximos passos</h3></div>
+        </div>
+      </section>
+
+      <!-- 31 ENTREGAS -->
+      <section class="slide white" data-title="Execução do quarter">
+        <div class="topline"></div>
+        <span class="eyebrow">Entregas</span>
+        <h2 style="margin-top:22px">Execução do quarter</h2>
+        <div class="stat-cards-row">
+          <div class="stat-card"><div class="stat-val">64</div><div class="stat-lbl">tarefas concluídas</div></div>
+          <div class="stat-card"><div class="stat-val">0</div><div class="stat-lbl">tarefas abertas no quarter</div></div>
+          <div class="stat-card"><div class="stat-val">6</div><div class="stat-lbl">pessoas envolvidas</div></div>
+          <div class="stat-card"><div class="stat-val">146,6h</div><div class="stat-lbl">apontadas no Q2</div></div>
+        </div>
+        <div class="hbar-block">
+          <div class="hbar-total">146,6h</div>
+          <div class="hbar-total-lbl">entregues no Q2, abril, maio e junho</div>
+          <div style="margin-top:16px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft)">Horas totais de entrega por mês</div>
+          <div class="hbar-row"><div class="hbar-m">ABR</div><div class="hbar-track"><div class="hbar-fill" style="width:69%"></div></div><div class="hbar-v">42,9h</div></div>
+          <div class="hbar-row"><div class="hbar-m">MAI</div><div class="hbar-track"><div class="hbar-fill" style="width:66%"></div></div><div class="hbar-v">41,3h</div></div>
+          <div class="hbar-row"><div class="hbar-m">JUN</div><div class="hbar-track"><div class="hbar-fill" style="width:100%"></div></div><div class="hbar-v">62,3h</div></div>
+        </div>
+      </section>
+
+      <!-- 32 CAPA PROXIMOS PASSOS -->
+      <section class="slide dark" data-title="Próximos passos">
+        <div class="topline"></div>
+        <span class="eyebrow">Agenda</span>
+        <h2 style="margin-top:22px">05 · Próximos passos</h2>
+        <div class="cover-menu-list">
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">01</span><h3>Resultados</h3></div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">02</span><h3>Objetivos</h3></div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">03</span><h3>Premissas e riscos</h3></div>
+          <div class="cover-menu-row" style="opacity:.35"><span class="num">04</span><h3>Entregas</h3></div>
+          <div class="cover-menu-row active"><span class="num">05</span><h3>Próximos passos</h3></div>
+        </div>
+      </section>
+
+      <!-- 33 BACKLOG IMEDIATO -->
+      <section class="slide" data-title="Backlog imediato">
+        <div class="topline"></div>
+        <span class="eyebrow">Próximos passos</span>
+        <h2 style="margin-top:22px">Backlog imediato do Q3</h2>
+        <div style="display:grid;gap:11px;margin-top:26px">
+          <div class="rank-item" style="padding:13px 20px"><div class="num-badge">1</div><div class="rank-body"><b>Escalar criativos campeões em campanhas isoladas</b><div class="rank-meta">Dono: <b>V4</b></div></div></div>
+          <div class="rank-item" style="padding:13px 20px"><div class="num-badge">2</div><div class="rank-body"><b>Fechar auditoria dos 238 leads abandonados + SLA</b><div class="rank-meta">Dono: <b>Cliente</b></div></div></div>
+          <div class="rank-item" style="padding:13px 20px"><div class="num-badge">3</div><div class="rank-body"><b>Padronizar motivo de desqualificação no CRM</b><div class="rank-meta">Dono: <b>Cliente</b></div></div></div>
+          <div class="rank-item" style="padding:13px 20px"><div class="num-badge">4</div><div class="rank-body"><b>Levantar impacto da automação de cancelamento indevida</b><div class="rank-meta">Dono: <b>Cliente</b></div></div></div>
+          <div class="rank-item" style="padding:13px 20px"><div class="num-badge">5</div><div class="rank-body"><b>Revisar keywords Google Ads de baixo CPA</b><div class="rank-meta">Dono: <b>V4</b></div></div></div>
+        </div>
+      </section>
+
+      <!-- 34 NPS -->
+      <section class="slide dark" data-title="Pesquisa de NPS">
+        <div class="cover-content" style="justify-content:center;align-items:center;text-align:center">
+          <div></div>
+          <div>
+            <span class="eyebrow">Antes de encerrar</span>
+            <h1 style="margin-top:22px;font-size:64px">Pesquisa de NPS</h1>
+            <div style="margin:26px auto 0;padding:16px;width:172px;border-radius:20px;background:white"><img src="assets/nps-qrcode.png" alt="QR code da pesquisa de NPS" style="width:100%;height:100%;display:block"></div>
+            <p class="lede" style="margin:22px auto 0;text-align:center">Aponte a câmera do celular e responda. Sua nota ajuda a gente a melhorar o próximo quarter.</p>
+          </div>
+          <div></div>
+        </div>
+      </section>
+
+      <!-- 35 OBRIGADO -->
+      <section class="slide red" data-title="Obrigado">
+        <div class="sphere" style="width:430px;height:430px;right:-80px;top:-115px;opacity:.55"></div>
+        <div class="sphere" style="width:245px;height:245px;left:-100px;bottom:-140px;opacity:.32"></div>
+        <div class="cover-content" style="justify-content:center;align-items:center;text-align:center">
+          <div>
+            <h1 style="font-size:104px">Obrigado!</h1>
+            <p class="lede" style="margin:0 auto;text-align:center">V4 Company · Colli&amp;Co</p>
+          </div>
+          <div></div>
+        </div>
+      </section>
+
+      <div class="slide-footer"><img id="footerLogo" src="assets/colli-red.png" alt=""></div>
+      <div class="slide-counter" id="slideCounter">01 / 35</div>
+      <nav class="navigation" aria-label="Navegação da apresentação">
+        <button class="nav-btn" id="prevBtn" aria-label="Slide anterior" data-testid="prev-slide"><svg class="icon"><use href="#i-arrow-left"></use></svg></button>
+        <button class="nav-btn" id="nextBtn" aria-label="Próximo slide" data-testid="next-slide"><svg class="icon"><use href="#i-arrow-right"></use></svg></button>
+      </nav>
+      <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+    </main>
+  </div>
+
+  <script>
+    const deck = document.getElementById("deck");
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const progressFill = document.getElementById("progressFill");
+    const slideCounter = document.getElementById("slideCounter");
+    const footerLogo = document.getElementById("footerLogo");
+    let current = 0;
+
+    function fitDeck() {
+      const viewportWidth = window.visualViewport?.width || document.documentElement.clientWidth || window.innerWidth;
+      const viewportHeight = window.visualViewport?.height || document.documentElement.clientHeight || window.innerHeight;
+      const scale = Math.max(.1, Math.min((viewportWidth - 16) / 1600, (viewportHeight - 16) / 900, 1));
+      deck.style.setProperty("--deck-scale", scale);
+    }
+
+    function goTo(index) {
+      current = Math.max(0, Math.min(slides.length - 1, index));
+      slides.forEach((slide, slideIndex) => { slide.classList.toggle("active", slideIndex === current); });
+      const number = String(current + 1).padStart(2, "0");
+      const total = String(slides.length).padStart(2, "0");
+      const activeSlide = slides[current];
+      const isDark = activeSlide.classList.contains("red") || activeSlide.classList.contains("dark");
+      slideCounter.textContent = `${number} / ${total}`;
+      slideCounter.style.color = isDark ? "rgba(255,255,255,.58)" : "rgba(20,20,20,.52)";
+      progressFill.style.width = `${((current + 1) / slides.length) * 100}%`;
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === slides.length - 1;
+      footerLogo.src = isDark ? "assets/colli-white.png" : "assets/colli-red.png";
+      footerLogo.style.opacity = current === 0 || current === slides.length - 1 ? "0" : "1";
+      document.title = `${number} | ${activeSlide.dataset.title || "Apresentação"}`;
+    }
+
+    prevBtn.addEventListener("click", () => goTo(current - 1));
+    nextBtn.addEventListener("click", () => goTo(current + 1));
+    window.addEventListener("resize", fitDeck);
+    window.visualViewport?.addEventListener("resize", fitDeck);
+    window.addEventListener("keydown", (event) => {
+      if (["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); goTo(current + 1); }
+      if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); goTo(current - 1); }
+      if (event.key === "Home") goTo(0);
+      if (event.key === "End") goTo(slides.length - 1);
+    });
+
+    let touchStartX = null;
+    deck.addEventListener("touchstart", (event) => { touchStartX = event.changedTouches[0].clientX; }, { passive: true });
+    deck.addEventListener("touchend", (event) => {
+      if (touchStartX === null) return;
+      const delta = event.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(delta) > 70) goTo(current + (delta < 0 ? 1 : -1));
+      touchStartX = null;
+    }, { passive: true });
+
+    fitDeck();
+    goTo(0);
+  </script>
+</body>
+</html>

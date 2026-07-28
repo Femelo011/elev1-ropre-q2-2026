@@ -1,0 +1,22 @@
+{
+  "fonte": "NEKT (Flow MCP) - Google Ads",
+  "projectDocumentId": "bsbatk7lemxb9j20e3y8n279",
+  "accountId": "6333476896",
+  "periodo": "2026-04-01 a 2026-06-30",
+  "extraido_em": "2026-07-27",
+  "campanhas": [
+    {"campaign": "Elevate | Search | Majestic - Investimento | Sudeste", "impressions": 1147, "clicks": 214, "cost": 998.96, "conversions": 2},
+    {"campaign": "Elevate | Search | Majestic - Veraneo | Sudeste", "impressions": 3571, "clicks": 192, "cost": 870.39, "conversions": 0},
+    {"campaign": "Elevate | Search | Majestic - Caraguatatuba | Sudeste", "impressions": 2608, "clicks": 188, "cost": 859.17, "conversions": 0},
+    {"campaign": "Elevate | Search | Majestic - Praia | Sudeste", "impressions": 2132, "clicks": 186, "cost": 854.31, "conversions": 1},
+    {"campaign": "Elevate | Search | Majestic - Caraguatatuba | Caraguatatuba", "impressions": 957, "clicks": 107, "cost": 801.93, "conversions": 1}
+  ],
+  "overall_q2": {"impressions": 10415, "clicks": 887, "cost": 4384.76, "conversions": 4},
+  "top_keywords": [
+    {"keyword": "apartamento lançamento litoral norte", "campaign": "Investimento", "clicks": 167, "cost": 787.43, "conversions": 2},
+    {"keyword": "casa de praia para comprar", "campaign": "Veraneo", "clicks": 92, "cost": 425.77, "conversions": 0},
+    {"keyword": "apartamento na praia", "campaign": "Praia", "clicks": 82, "cost": 382.34, "conversions": 1},
+    {"keyword": "imóvel em caraguatatuba", "campaign": "Caraguatatuba Sudeste", "clicks": 78, "cost": 360.07, "conversions": 0}
+  ],
+  "nota": "100% Search, 5 campanhas geograficas/tematicas. conversions = 4 no Q2, consistente com os '4 leads Google' citados no deck previo. Sem campanhas Display/PMax ativas no periodo."
+}

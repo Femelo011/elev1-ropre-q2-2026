@@ -1,0 +1,35 @@
+{
+  "fonte": "NEKT (Flow MCP) - Meta Ads",
+  "projectDocumentId": "bsbatk7lemxb9j20e3y8n279",
+  "accountId": "act_1312693780484270",
+  "periodo": "2026-04-01 a 2026-06-30",
+  "extraido_em": "2026-07-27",
+  "overall_mensal": [
+    {"mes": "2026-04", "spend": 1792.36, "impressions": 33367, "clicks": 784, "reach": 29665, "leads": 27},
+    {"mes": "2026-05", "spend": 9920.89, "impressions": 129388, "clicks": 2546, "reach": 116875, "leads": 142},
+    {"mes": "2026-06", "spend": 19338.71, "impressions": 314503, "clicks": 4968, "reach": 298366, "leads": 277}
+  ],
+  "overall_q2": {"spend": 31051.96, "impressions": 477258, "clicks": 8298, "leads_action_lead": 446},
+  "nota_reconciliacao": "action_type='lead' do Meta soma 446 no Q2, acima dos 417 leads Meta citados no deck previo (fonte CRM/Growth Pack). Divergencia de 29 leads entre o que a plataforma registra como acao 'lead' e o que efetivamente chegou ao funil comercial - marcar como conflito/lacuna, nao escolher automaticamente.",
+  "top_campanhas_por_leads": "ver query completa no chat - 9 campanhas ativas, todas com padrao [V4][C:XX]...[P:Elevate], top gasto: C:02 MEIO R$8.588,71 / C:01 TOPO-Sudeste R$7.966,48",
+  "top_publicos_por_leads_resumo": "adset 'Lookalike 1% Leads Elevate | SP Capital + Grande SP | 32-58' e 'Carros de luxo' e 'Investimento e bolsa de valores' concentram o maior volume de leads",
+  "top_criativo_por_leads": {"ad_name": "AD04 - [F:VIDEO] MAJESTIC | Zoom na terra", "leads_agregado_aprox": "maior volume entre os anuncios, presente em varias campanhas/adsets, ate 60 leads numa unica combinacao campanha/adset/anuncio"},
+  "demografia_leads": [
+    {"age": "45-54", "gender": "male", "leads": 131},
+    {"age": "35-44", "gender": "male", "leads": 116},
+    {"age": "55-64", "gender": "male", "leads": 57},
+    {"age": "45-54", "gender": "female", "leads": 57},
+    {"age": "35-44", "gender": "female", "leads": 29},
+    {"age": "55-64", "gender": "female", "leads": 23},
+    {"age": "25-34", "gender": "male", "leads": 22},
+    {"age": "25-34", "gender": "female", "leads": 10}
+  ],
+  "posicionamento_leads": [
+    {"publisher_platform": "instagram", "platform_position": "feed", "spend": 4284.66, "leads": 196},
+    {"publisher_platform": "instagram", "platform_position": "instagram_reels", "spend": 2014.01, "leads": 105},
+    {"publisher_platform": "instagram", "platform_position": "instagram_stories", "spend": 569.50, "leads": 61},
+    {"publisher_platform": "facebook", "platform_position": "facebook_reels", "spend": 396.00, "leads": 49},
+    {"publisher_platform": "facebook", "platform_position": "feed", "spend": 225.13, "leads": 30},
+    {"publisher_platform": "facebook", "platform_position": "facebook_stories", "spend": 13.67, "leads": 5}
+  ]
+}
